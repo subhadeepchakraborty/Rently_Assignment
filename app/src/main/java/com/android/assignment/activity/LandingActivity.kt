@@ -48,19 +48,23 @@ class LandingActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickLis
         handlerThread.start()
         handler= Handler(handlerThread.looper)
 
+        val mapFragment = supportFragmentManager
+            .findFragmentById(R.id.fragment_google_map) as SupportMapFragment?
+        mapFragment!!.getMapAsync(this)
+
+        // Check For Connection
         if(!Constants.checkForIntenetConnection(this)){
             Toast.makeText(this,"Check Your Internet Connection",Toast.LENGTH_SHORT).show()
             finish()
         }
+
         Snackbar.make(binding.root,"Please Hold.While we are Loading the map...",Snackbar.LENGTH_LONG).show()
-        val mapFragment = supportFragmentManager
-            .findFragmentById(R.id.fragment_google_map) as SupportMapFragment?
-        mapFragment!!.getMapAsync(this)
 
         binding.fab.setOnClickListener(this)
 
     }
 
+    // Initialize LatLong Variables
     private  fun handleLatLonValue() {
         KochiLatLong=LatLng(Constants.KOCHI_LAT.toDouble(),Constants.KOCHI_LONG.toDouble())
         CoimbatoreLatLong=LatLng(Constants.COIMBATORE_LAT.toDouble(),Constants.COIMBATORE_LONG.toDouble())
@@ -69,8 +73,9 @@ class LandingActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickLis
 
         latLongList= listOf<LatLng>(KochiLatLong,CoimbatoreLatLong,MaduraiLatLong,MunnarLatLong,KochiLatLong)
         locationTitleList =  listOf<String>("Kochi","Coimbatore","Madurai","Munnar","Kochi")
-        options = PolylineOptions().width(5f).color(Color.BLUE).geodesic(true)
+        options = PolylineOptions().width(10f).color(Color.BLUE).geodesic(true)
     }
+
 
     override fun onMapReady(map: GoogleMap?) {
         handleLatLonValue()
@@ -81,12 +86,13 @@ class LandingActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickLis
 
     }
 
+    // Handle Navigation
     private fun handleMapHandler() {
         var i = 0
         handler.postDelayed(Runnable {
             handler.postDelayed(runnable,delayInMillis)
             if(i == latLongList!!.size){
-                options = PolylineOptions().width(5f).color(Color.BLUE).geodesic(true)
+                options = PolylineOptions().width(10f).color(Color.BLUE).geodesic(true)
                 resetMap()
                 i=0
             }
@@ -100,14 +106,14 @@ class LandingActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickLis
 
     }
 
-
-  @Synchronized  fun resetMap(){
+    //Clear Map
+    fun resetMap(){
         runOnUiThread {
         googleMap.clear()
         }
     }
 
-
+    // Customization to Map
     private fun handlerMapNavigation(googleMap: GoogleMap, point: LatLng, titleText: String) {
 
         options!!.add(point)
@@ -125,7 +131,7 @@ class LandingActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickLis
             R.id.fab ->{
                          Snackbar.make(binding.root, "Pointing to Starting point", Snackbar.LENGTH_LONG).show()
                          handler.removeCallbacksAndMessages(null);
-                         options = PolylineOptions().width(20f).color(Color.BLUE).geodesic(true)
+                         options = PolylineOptions().width(10f).color(Color.BLUE).geodesic(true)
                          resetMap()
                          handleMapHandler()
                        }
